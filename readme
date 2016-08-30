@@ -1,8 +1,8 @@
 Você chegou aqui pra baixar esse programa maravilhoso que roda sem instalação na sua vida.
 CAW é a sigla para CLI Addon WOW! Sim, o nome é feio, a sigla não faz sentido, mas passáros.
 
-Pra usar essa bodega você instala o Python 2:
-https://www.python.org/ftp/python/2.7.12/ Ou: https://www.python.org/downloads/windows/ Se você for preguiçoso
+As coisas mudaram um pouco, agora você precisa do Anaconda:
+https://www.continuum.io/downloads#windows é o link pra baixar as versões Windows. Você quer a versão pro Python 2.7.
 Se você usa OSX ou Linux, não precisa. A não ser que você use algo bem dark tipo Suicide Linux (e acho que até ele tem).
 
 Daí você vai no cmd e roda 'python caw.py -i elvui', que ele faz tudo sozinho (isso é, se você estiver no diretório certo. Pra garantir, aperta o botão direito enquanto segura o shift, ou o control (Não lembro), e soca o dedo em "Open command prompt here".
