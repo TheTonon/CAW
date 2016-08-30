@@ -2,11 +2,14 @@
 import optparse
 import os
 from urllib import urlretrieve
+import urllib
+from bs4 import BeautifulSoup
 from tempfile import mktemp
 from zipfile import ZipFile
 import time
 import shutil
 import sys
+import requests
 
 tTime = 0
 
@@ -15,15 +18,26 @@ def main():
     p.add_option('--install', '-i', default="elvui")
     options, arguments = p.parse_args()
 
+    global tTime
+    tTime = time.time()
+
     if options.install == 'elvui':
         print "Instalando ElvUI a partir do Git Oficial."
-        global tTime
-        tTime = time.time()
         elvUIURL = 'http://git.tukui.org/Elv/elvui/repository/archive.zip'
         print "Diretório da ElvUI Utilizado: http://git.tukui.org/Elv/elvui/repository/archive.zip."
-        downloadAndInstall(elvUIURL)
+        downloadAndInstall(elvUIURL, "elvui")
+    else:
+        addonName = options.install
+        #try:
+        #    addonURL = parseAddonURL(addonName, "https://www.wowace.com")
+        #else:
+        #    addonURL = parseAddonURL(addonName, "https://wow.curseforge.com")
+        addonURL = parseCurseURL(addonName)
+        print "Baixando o addon %(addonName)s" % locals()
+        print addonURL
+        downloadAndInstall(addonURL, addonName)
 
-def downloadAndInstall(url):
+def downloadAndInstall(url, addon):
     print "Criando diretórios e arquivos temporários."
     filename = mktemp('.zip')
     destDir = checkForWoWInstallation()
@@ -37,8 +51,11 @@ def downloadAndInstall(url):
     start_time = time.time()
     try:
         print "Excluindo arquivos antigos."
-        shutil.rmtree(destDir+'/ElvUI/')
-        shutil.rmtree(destDir+'/ElvUI_Config/')
+        if addon == "elvui":
+            shutil.rmtree(destDir+'/ElvUI/')
+            shutil.rmtree(destDir+'/ElvUI_Config/')
+        else:
+            shutil.rmtree(destDir+addon+'/')
     except:
         pass
 
@@ -46,9 +63,10 @@ def downloadAndInstall(url):
     start_time = time.time()
     try:
         print "Copiando arquivos novos e retirando o lixo."
-        shutil.move(destDir+'/elvui.git/ElvUI/', destDir)
-        shutil.move(destDir+'/elvui.git/ElvUI_Config/', destDir)
-        shutil.rmtree(destDir+'/elvui.git/')
+        if addon == "elvui":
+            shutil.move(destDir+'/elvui.git/ElvUI/', destDir)
+            shutil.move(destDir+'/elvui.git/ElvUI_Config/', destDir)
+            shutil.rmtree(destDir+'/elvui.git/')
     except:
         pass
 
@@ -84,6 +102,46 @@ def checkForWoWInstallation():
         if isdir(osxdir+addons):
             print "Diretório de AddOns ok."
             return osxdir+addons
+
+def parseAddonURL(addonName, base):
+    start_time = time.time()
+    linkToGo = ""
+    toSearch = addonName.lower()
+    urlT = urllib.urlopen("https://www.wowace.com/addons/%(toSearch)s/" % locals())
+    soup = BeautifulSoup(urlT)
+    countLink = 0
+    for link in soup.findAll("a"):
+        linkParseado = link.get("href")
+        if linkParseado.startswith("/addons/%(toSearch)s/files/" % locals()):
+            countLink = countLink + 1
+            if countLink == 2:
+                linkToGo = linkParseado
+                print ("Link encontrado em %s segundos." % (time.time() - start_time))
+                break
+
+    realLink = base+linkToGo
+    print realLink
+    urlR = urllib.urlopen(realLink)
+    soup2 = BeautifulSoup(urlR)
+    for link in soup2.findAll("a"):
+        linkP = link.get("href")
+        if linkP.startswith("https://www.wowace.com/media/files"):
+            print ("Mandou de volta em %s segundos." % (time.time() - start_time))
+            return linkP
+            break
+    if realLink == None:
+        return Exception
+
+def parseCurseURL(addonName):
+    with requests.session() as s:
+        s.headers['user-agent'] = 'Mozilla/5.0'
+        addon = addonName.lower()
+        r = s.get('https://mods.curse.com/addons/wow/%(addon)s/download' % locals())
+        soup = BeautifulSoup(r.text, 'html.parser')
+
+        url  = soup.find('a', 'download-link')['data-href']
+
+        return url
 
 def dlProgress(count, blockSize, totalSize):
       percent = int(count*blockSize*100/totalSize)
