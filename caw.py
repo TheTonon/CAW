@@ -22,9 +22,9 @@ def main():
     tTime = time.time()
 
     if options.install == 'elvui':
-        print "Instalando ElvUI a partir do Git Oficial."
+        print("Installing ElvUI from official git repositories")
         elvUIURL = 'http://git.tukui.org/Elv/elvui/repository/archive.zip'
-        print "Diretório da ElvUI Utilizado: http://git.tukui.org/Elv/elvui/repository/archive.zip."
+        print("Repository that's being used: http://git.tukui.org/Elv/elvui/repository/archive.zip.")
         downloadAndInstall(elvUIURL, "elvui")
     else:
         addonName = options.install
@@ -33,24 +33,24 @@ def main():
         #else:
         #    addonURL = parseAddonURL(addonName, "https://wow.curseforge.com")
         addonURL = parseCurseURL(addonName)
-        print "Baixando o addon %(addonName)s" % locals()
-        print addonURL
+        print("Downloading addon %(addonName)s") % locals()
+        print(addonURL)
         downloadAndInstall(addonURL, addonName)
 
 def downloadAndInstall(url, addon):
-    print "Criando diretórios e arquivos temporários."
+    print("Creating temporary directories and files")
     filename = mktemp('.zip')
     destDir = checkForWoWInstallation()
-    print "Baixando o addon."
+    print("Downloading addon.")
     name, hdrs = urlretrieve(url, filename, reporthook=dProgress)
     addon = ZipFile(filename)
-    print "\nExtraindo arquivos."
+    print("\nExtracting files.")
     start_time = time.time()
     addon.extractall(destDir)
-    print ("Extração concluída em %s segundos." % (time.time() - start_time))
+    print("Extraction done in %s seconds." % (time.time() - start_time))
     start_time = time.time()
     try:
-        print "Excluindo arquivos antigos."
+        print("Excluding old files")
         if addon == "elvui":
             shutil.rmtree(destDir+'/ElvUI/')
             shutil.rmtree(destDir+'/ElvUI_Config/')
@@ -59,7 +59,7 @@ def downloadAndInstall(url, addon):
     except:
         pass
 
-    print ("Exclusão concluída em %s segundos." % (time.time() - start_time))
+    print("Exclusion done in %s seconds." % (time.time() - start_time))
     start_time = time.time()
     try:
         print "Copiando arquivos novos e retirando o lixo."
@@ -70,10 +70,10 @@ def downloadAndInstall(url, addon):
     except:
         pass
 
-    print ("Tudo pronto em %s segundos." % (time.time() - start_time))
+    print("Done in %s seconds." % (time.time() - start_time))
     addon.close()
-    print "Instalação feita com sucesso."
-    print ("Tempo total da instalação: %s segundos." % (time.time() - tTime))
+    print("Installation completed.")
+    print("Total running time: %s seconds." % (time.time() - tTime))
 
 def checkForWoWInstallation():
     print "Conferindo qual a sua instalação."
