@@ -76,7 +76,7 @@ def downloadAndInstall(url, addon):
     print("Total running time: %s seconds." % (time.time() - tTime))
 
 def checkForWoWInstallation():
-    print "Conferindo qual a sua instalação."
+    print "Finding your WoW installation"
 
     isdir = os.path.isdir
 
@@ -86,21 +86,21 @@ def checkForWoWInstallation():
     addons = "Interface/AddOns"
 
     if isdir(windir86):
-        print "WoW 32-bits no Windows encontrado."
+        print("WoW found in Windows 32")
         if isdir(windir86+addons):
-            print "Diretório de AddOns ok."
+            print("Found addons directory.")
             return windir86+addons
 
     elif isdir(windir64):
-        print "WoW 64 bits no Windows encontrado."
+        print("WoW found in Windows 64.")
         if isdir(windir64+addons):
-            print "Diretório de AddOns ok."
+            print("Found addons directory")
             return windir64+addons
 
     elif isdir(osxdir):
-        print "WoW no OSX encontrado."
+        print("WoW found in MacOS.")
         if isdir(osxdir+addons):
-            print "Diretório de AddOns ok."
+            print "Found addons directory"
             return osxdir+addons
 
 def parseAddonURL(addonName, base):
@@ -126,7 +126,7 @@ def parseAddonURL(addonName, base):
     for link in soup2.findAll("a"):
         linkP = link.get("href")
         if linkP.startswith("https://www.wowace.com/media/files"):
-            print ("Mandou de volta em %s segundos." % (time.time() - start_time))
+            print("Got it back in %s seconds." % (time.time() - start_time))
             return linkP
             break
     if realLink == None:
