@@ -13,6 +13,7 @@ import requests
 
 tTime = 0
 
+
 def main():
     p = optparse.OptionParser()
     p.add_option('--install', '-i', default="elvui")
@@ -24,18 +25,18 @@ def main():
     if options.install == 'elvui':
         print("Installing ElvUI from official git repositories")
         elvUIURL = 'http://git.tukui.org/Elv/elvui/repository/archive.zip'
-        print("Repository that's being used: http://git.tukui.org/Elv/elvui/repository/archive.zip.")
+        print(
+            "Repository that's being",
+            "used: http://git.tukui.org/Elv/elvui/repository/archive.zip."
+        )
         downloadAndInstall(elvUIURL, "elvui")
     else:
         addonName = options.install
-        #try:
-        #    addonURL = parseAddonURL(addonName, "https://www.wowace.com")
-        #else:
-        #    addonURL = parseAddonURL(addonName, "https://wow.curseforge.com")
         addonURL = parseCurseURL(addonName)
         print("Downloading addon %(addonName)s") % locals()
         print(addonURL)
         downloadAndInstall(addonURL, addonName)
+
 
 def downloadAndInstall(url, addon):
     print("Creating temporary directories and files")
@@ -56,18 +57,18 @@ def downloadAndInstall(url, addon):
             shutil.rmtree(destDir+'/ElvUI_Config/')
         else:
             shutil.rmtree(destDir+addon+'/')
-    except:
+    except Exception:
         pass
 
     print("Exclusion done in %s seconds." % (time.time() - start_time))
     start_time = time.time()
     try:
-        print "Copiando arquivos novos e retirando o lixo."
+        print("Copying files.")
         if addon == "elvui":
             shutil.move(destDir+'/elvui.git/ElvUI/', destDir)
             shutil.move(destDir+'/elvui.git/ElvUI_Config/', destDir)
             shutil.rmtree(destDir+'/elvui.git/')
-    except:
+    except Exception:
         pass
 
     print("Done in %s seconds." % (time.time() - start_time))
@@ -75,8 +76,9 @@ def downloadAndInstall(url, addon):
     print("Installation completed.")
     print("Total running time: %s seconds." % (time.time() - tTime))
 
+
 def checkForWoWInstallation():
-    print "Finding your WoW installation"
+    print("Looking for WoW installation")
 
     isdir = os.path.isdir
 
@@ -100,14 +102,17 @@ def checkForWoWInstallation():
     elif isdir(osxdir):
         print("WoW found in MacOS.")
         if isdir(osxdir+addons):
-            print "Found addons directory"
+            print("Found addons directory")
             return osxdir+addons
+
 
 def parseAddonURL(addonName, base):
     start_time = time.time()
     linkToGo = ""
     toSearch = addonName.lower()
-    urlT = urllib.urlopen("https://www.wowace.com/addons/%(toSearch)s/" % locals())
+    urlT = urllib.urlopen(
+        "https://www.wowace.com/addons/%(toSearch)s/" % locals()
+    )
     soup = BeautifulSoup(urlT)
     countLink = 0
     for link in soup.findAll("a"):
@@ -116,11 +121,15 @@ def parseAddonURL(addonName, base):
             countLink = countLink + 1
             if countLink == 2:
                 linkToGo = linkParseado
-                print ("Link encontrado em %s segundos." % (time.time() - start_time))
+                print(
+                    "Found addon link in %s seconds." % (
+                        time.time() - start_time
+                    )
+                )
                 break
 
     realLink = base+linkToGo
-    print realLink
+    print(realLink)
     urlR = urllib.urlopen(realLink)
     soup2 = BeautifulSoup(urlR)
     for link in soup2.findAll("a"):
@@ -129,25 +138,30 @@ def parseAddonURL(addonName, base):
             print("Got it back in %s seconds." % (time.time() - start_time))
             return linkP
             break
-    if realLink == None:
+    if realLink is None:
         return Exception
+
 
 def parseCurseURL(addonName):
     with requests.session() as s:
         s.headers['user-agent'] = 'Mozilla/5.0'
         addon = addonName.lower()
-        r = s.get('https://mods.curse.com/addons/wow/%(addon)s/download' % locals())
+        r = s.get(
+            'https://mods.curse.com/addons/wow/%(addon)s/download' % locals()
+        )
         soup = BeautifulSoup(r.text, 'html.parser')
 
-        url  = soup.find('a', 'download-link')['data-href']
+        url = soup.find('a', 'download-link')['data-href']
 
         return url
 
+
 def dlProgress(count, blockSize, totalSize):
-      percent = int(count*blockSize*100/totalSize)
-      sys.stdout.write("%2d%%" % percent)
-      sys.stdout.write("\b\b\b")
-      sys.stdout.flush()
+    percent = int(count*blockSize*100/totalSize)
+    sys.stdout.write("%2d%%" % percent)
+    sys.stdout.write("\b\b\b")
+    sys.stdout.flush()
+
 
 def dProgress(count, block_size, total_size):
     global start_time
@@ -158,8 +172,9 @@ def dProgress(count, block_size, total_size):
     progress_size = int(count * block_size)
     speed = int(progress_size / (1024 * duration))
     percent = int(count * block_size * 100 / total_size)
-    sys.stdout.write("\r...%d%%, %d MB, %d KB/s, %d segundos se passaram." %
-                    (percent, progress_size / (1024 * 1024), speed, duration))
+    sys.stdout.write("\r...%d%%, %d MB, %d KB/s, %d seconds has passed" %
+                     (percent, progress_size / (1024 * 1024), speed, duration))
     sys.stdout.flush()
+
 
 main()
