@@ -8,6 +8,6 @@ setup(
     author_email='viniciustonon@gmail.com',
     description='CAW WoW addon manager',
     packages=find_packages(),
-    install_requires=['urllib', 'BeautifulSoup'],
+    install_requires=['beautifulsoup4'],
     scripts=['bin/caw'],
 )
